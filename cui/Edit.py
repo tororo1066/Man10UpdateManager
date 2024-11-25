@@ -41,7 +41,7 @@ class Edit(AbstractCUI):
         print("編集する項目を選択してください")
         while True:
             if (selected := questionary.select("編集する項目を選択してください",
-                                               choices=["ホスト名", "ユーザ名", "パスワード"]).ask()) is None:
+                                               choices=["ホスト名", "ユーザ名", "パスワード", "保存"]).ask()) is None:
                 return
             elif selected == "ホスト名":
                 if (new_host := questionary.text("新しいホスト名を入力してください").ask()) is None:
@@ -55,7 +55,8 @@ class Edit(AbstractCUI):
                 if (new_password := questionary.password("新しいパスワードを入力してください").ask()) is None:
                     return
                 host.password = new_password
-            break
+            elif selected == "保存":
+                break
         with open("data/hosts.json", "w") as file:
             json.dump([host.to_json() for host in self.hosts.values()], file, indent=4)
         print("編集が完了しました")
@@ -72,7 +73,7 @@ class Edit(AbstractCUI):
         print("編集する項目を選択してください")
         while True:
             if (selected := questionary.select("編集する項目を選択してください",
-                                               choices=["ホスト", "パス"]).ask()) is None:
+                                               choices=["ホスト", "パス", "保存"]).ask()) is None:
                 return
             elif selected == "ホスト":
                 if (new_host := questionary.select("新しいホストを選択してください",
@@ -83,7 +84,8 @@ class Edit(AbstractCUI):
                 if (new_path := questionary.path("新しいパスを入力してください").ask()) is None:
                     return
                 server.path = new_path
-            break
+            elif selected == "保存":
+                break
         with open("data/servers.json", "w") as file:
             json.dump([server.to_json() for server in self.servers.values()], file, indent=4)
         print("編集が完了しました")
@@ -100,7 +102,7 @@ class Edit(AbstractCUI):
         print("編集する項目を選択してください")
         while True:
             if (selected := questionary.select("編集する項目を選択してください",
-                                               choices=["削除するファイルの正規表現", "プラグインが入っているフォルダのパス", "適用するサーバー", "依存するプラグイン"]).ask()) is None:
+                                               choices=["削除するファイルの正規表現", "プラグインが入っているフォルダのパス", "適用するサーバー", "依存するプラグイン", "保存"]).ask()) is None:
                 return
             elif selected == "削除するファイルの正規表現":
                 if (new_remove_pattern := questionary.text("削除するファイルの正規表現を入力してください").ask()) is None:
@@ -120,3 +122,8 @@ class Edit(AbstractCUI):
                                                              choices=[Choice(plugin.name, checked=plugin in plugin.depend_updates) for plugin in self.plugins.values()]).ask()) is None:
                     return
                 plugin.depend_updates = [plugin for plugin in self.plugins.values() if plugin.name in new_depend_updates]
+            elif selected == "保存":
+                break
+        with open("data/plugins.json", "w") as file:
+            json.dump([plugin.to_json() for plugin in self.plugins.values()], file, indent=4)
+        print("編集が完了しました")
