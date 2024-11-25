@@ -1,64 +1,46 @@
-import subprocess
+import os
 from typing import Pattern
 
-from Server import Server
+from data_class.Server import Server
 
 
-# 実行しているユーザーから別のユーザーにファイルをコピーする
-def copy_file(src, dest, dest_server: Server):
+def copy_files(src_folder: str, dest: str, dest_server: Server):
     try:
-        subprocess.run(
-            ["scp", src, f"{dest_server.user}@{dest_server.host}:{dest}"],
-            check=True,
-            input=f"{dest_server.password}\n",
-        )
-        return True
-    except subprocess.CalledProcessError as e:
-        print("Error: ", e)
-        return False
+        client = dest_server.create_ssh_client()
+        print("Connected to {}".format(dest_server.host.name))
 
-def remove_files(pattern: Pattern, dest_server: Server):
+        sftp = client.open_sftp()
+
+        print("Trying to copy files from {} to {}".format(src_folder, dest_server.path + dest))
+        for file in os.listdir(src_folder):
+            path = os.path.join(src_folder, file)
+            dest_path = os.path.join(dest_server.path, dest, file)
+            print("Trying to copy {} to {}".format(path, dest_path))
+            sftp.put(path, dest_path)
+            print("Copied {} to {}".format(path, dest_path))
+
+        sftp.close()
+        client.close()
+    except Exception as e:
+        print(e)
+
+def remove_files(pattern: Pattern, dest: str, dest_server: Server):
     try:
-        # files = subprocess.run(
-        #     ["expect", "-c", f"""
-        #     spawn ssh {dest_server.user}@{dest_server.host} "ls {dest_server.path}"
-        #     expect \\\"password:\\\"
-        #     send \\\"{dest_server.password}\\n\\\"
-        #     interact
-        #     """],
-        #     stdout=subprocess.PIPE,
-        #     text=True
-        # ).stdout.split("\n")
-        #
-        # removable_files = [f for f in files if pattern.match(f)]
-        # subprocess.run(
-        #     ["expect", "-c", f"""
-        #     spawn ssh {dest_server.user}@{dest_server.host} "rm {' '.join(removable_files)}"
-        #     expect \\\"password:\\\"
-        #     send \\\"{dest_server.password}\\n\\\"
-        #     interact
-        #     """],
-        # )
+        client = dest_server.create_ssh_client()
+        print("Connected to {}".format(dest_server.host.name))
 
-        files = subprocess.run(
-            ["ssh", f"{dest_server.user}@{dest_server.host}", f"ls {dest_server.path}"],
-            stdout=subprocess.PIPE,
-            text=True,
-            input=f"{dest_server.password}\n",
-            check=True
-        ).stdout.split("\n")
+        sftp = client.open_sftp()
 
-        removable_files = [f for f in files if pattern.match(f)]
+        print("Trying to remove files that match {} from {}".format(pattern, os.path.join(dest_server.path, dest)))
+        for file in sftp.listdir(os.path.join(dest_server.path, dest)):
+            file_path = sftp.normalize(os.path.join(dest_server.path, dest, file))
+            print("Checking {}".format(file))
+            if os.path.isfile(file_path) and pattern.match(file):
+                print("Trying to remove {}".format(file))
+                sftp.remove(file_path)
+                print("Removed {}".format(file))
 
-        subprocess.run(
-            ["ssh", f"{dest_server.user}@{dest_server.host}", f"rm {' '.join(removable_files)}"],
-            input=f"{dest_server.password}\n",
-            text=True,
-            check=True
-        )
-
-
-        return True
-    except subprocess.CalledProcessError as e:
-        print("Error: ", e)
-        return False
+        sftp.close()
+        client.close()
+    except Exception as e:
+        print(e)
