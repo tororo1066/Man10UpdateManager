@@ -24,13 +24,16 @@ class RegisterHost(AbstractCUI):
                 print("その名前は既に登録されています")
                 continue
             break
-        if (host := questionary.text("ホスト名を入力してください").ask()) is None:
-            return
-        if (user := questionary.text("ユーザ名を入力してください").ask()) is None:
-            return
-        if (password := questionary.password("パスワードを入力してください").ask()) is None:
-            return
-        self.hosts[name] = Host(name, host, user, password)
+        if questionary.confirm("ローカル上ですか？").ask():
+            self.hosts[name] = Host(name, "", "", "", True)
+        else:
+            if (host := questionary.text("ホスト名を入力してください").ask()) is None:
+                return
+            if (user := questionary.text("ユーザ名を入力してください").ask()) is None:
+                return
+            if (password := questionary.password("パスワードを入力してください").ask()) is None:
+                return
+            self.hosts[name] = Host(name, host, user, password)
         with open("data/hosts.json", "w") as file:
             json.dump([host.to_json() for host in self.hosts.values()], file, indent=4)
         print("登録が完了しました")

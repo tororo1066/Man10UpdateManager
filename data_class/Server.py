@@ -1,7 +1,5 @@
 import os
 
-import paramiko
-
 from data_class.Host import Host
 
 
@@ -22,10 +20,3 @@ class Server:
 
     def __str__(self):
         return f"{self.name}(host: {self.host.name}, path: {self.path})"
-
-    def create_ssh_client(self) -> paramiko.SSHClient:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.WarningPolicy())
-        client.load_system_host_keys()
-        client.connect(hostname=self.host.host, username=self.host.user, password=self.host.password)
-        return client

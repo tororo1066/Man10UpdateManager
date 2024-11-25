@@ -1,12 +1,16 @@
 import os
+import shutil
 from typing import Pattern
 
 from data_class.Server import Server
 
 
 def copy_files(src_folder: str, dest: str, dest_server: Server):
+    if dest_server.host.local:
+        copy_files_local(src_folder, dest)
+        return
     try:
-        client = dest_server.create_ssh_client()
+        client = dest_server.host.create_ssh_client()
         print(f"{dest_server.host.name}に接続しました")
 
         sftp = client.open_sftp()
@@ -24,8 +28,11 @@ def copy_files(src_folder: str, dest: str, dest_server: Server):
         print(e)
 
 def remove_files(pattern: Pattern, dest: str, dest_server: Server):
+    if dest_server.host.local:
+        remove_files_local(pattern, dest)
+        return
     try:
-        client = dest_server.create_ssh_client()
+        client = dest_server.host.create_ssh_client()
         print(f"{dest_server.host.name}に接続しました")
 
         sftp = client.open_sftp()
@@ -41,3 +48,18 @@ def remove_files(pattern: Pattern, dest: str, dest_server: Server):
         client.close()
     except Exception as e:
         print(e)
+
+def copy_files_local(src_folder: str, dest: str):
+    print(f"{src_folder}から{dest}にファイルをコピー中...")
+    for file in os.listdir(src_folder):
+        path = os.path.join(src_folder, file)
+        dest_path = os.path.join(dest, file)
+        shutil.copy(path, dest_path)
+        print(f"{path}を{dest_path}にコピーしました")
+
+def remove_files_local(pattern: Pattern, dest: str):
+    print(f"{dest}から{pattern}にマッチするファイルを削除中...")
+    for file in os.listdir(dest):
+        if os.path.isfile(os.path.join(dest, file)) and pattern.match(file):
+            os.remove(os.path.join(dest, file))
+            print(f"{file}を削除しました")

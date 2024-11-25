@@ -30,7 +30,7 @@ class RegisterPlugin(AbstractCUI):
                 continue
             break
 
-        if (source_folder := questionary.text("プラグインが入っているフォルダのパスを入力してください").ask()) is None:
+        if (source_folder := questionary.path("プラグインが入っているフォルダのパスを入力してください").ask()) is None:
             return
         if (target_servers := questionary.checkbox("適用するサーバを選択してください", choices=[server.name for server in self.servers.values()]).ask()) is None:
             return
