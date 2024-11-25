@@ -37,7 +37,7 @@ def remove_files(pattern: Pattern, dest: str, dest_server: Server):
 
         sftp = client.open_sftp()
 
-        print(f"{os.path.join(dest_server.path, dest)}から{pattern}にマッチするファイルを削除中...")
+        print(f"{os.path.join(dest_server.path, dest)}から{pattern.pattern}にマッチするファイルを削除中...")
         for file in sftp.listdir(os.path.join(dest_server.path_with_plugins(), dest)):
             file_path = sftp.normalize(os.path.join(dest_server.path_with_plugins(), dest, file))
             if os.path.isfile(file_path) and pattern.match(file):
@@ -58,7 +58,7 @@ def copy_files_local(src_folder: str, dest: str):
         print(f"{path}を{dest_path}にコピーしました")
 
 def remove_files_local(pattern: Pattern, dest: str):
-    print(f"{dest}から{pattern}にマッチするファイルを削除中...")
+    print(f"{dest}から{pattern.pattern}にマッチするファイルを削除中...")
     for file in os.listdir(dest):
         if os.path.isfile(os.path.join(dest, file)) and pattern.match(file):
             os.remove(os.path.join(dest, file))

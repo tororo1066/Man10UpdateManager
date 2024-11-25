@@ -39,5 +39,5 @@ class Plugin:
             plugins[depend_update].update(servers)
         for server in self.target_servers:
             if len(servers) == 0 or server.host in servers:
-                Utils.remove_files(self.remove_pattern, "", server)
+                # Utils.remove_files(self.remove_pattern, "", server)
                 Utils.copy_files(self.source_folder, "", server)
