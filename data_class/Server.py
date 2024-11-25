@@ -25,6 +25,7 @@ class Server:
 
     def create_ssh_client(self) -> paramiko.SSHClient:
         client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.WarningPolicy())
         client.load_system_host_keys()
         client.connect(hostname=self.host.host, username=self.host.user, password=self.host.password)
         return client
