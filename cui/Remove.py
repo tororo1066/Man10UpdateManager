@@ -39,6 +39,10 @@ class Remove(AbstractCUI):
             if questionary.confirm("本当に削除しますか？ このホストに依存するサーバーも削除されます").ask():
                 for server in list(self.servers.values()):
                     if server.host == self.hosts[name]:
+                        for plugin in list(self.plugins.values()):
+                            if server in plugin.target_servers:
+                                plugin.target_servers.remove(server)
+                                print(f"{plugin.name}の依存先から{server.name}を削除しました")
                         print(f"{server.name}を削除しました")
                         del self.servers[server.name]
                 del self.hosts[name]
