@@ -37,7 +37,7 @@ class Remove(AbstractCUI):
                                         choices=[host.name for host in self.hosts.values()]).ask()) is None:
                 return
             if questionary.confirm("本当に削除しますか？ このホストに依存するサーバーも削除されます").ask():
-                for server in self.servers.values():
+                for server in list(self.servers.values()):
                     if server.host == self.hosts[name]:
                         print(f"{server.name}を削除しました")
                         del self.servers[server.name]
@@ -57,7 +57,7 @@ class Remove(AbstractCUI):
                                         choices=[server.name for server in self.servers.values()]).ask()) is None:
                 return
             if questionary.confirm("本当に削除しますか？").ask():
-                for plugin in self.plugins.values():
+                for plugin in list(self.plugins.values()):
                     if self.servers[name] in plugin.target_servers:
                         plugin.target_servers.remove(self.servers[name])
                         print(f"{plugin.name}の依存先から{name}を削除しました")
@@ -77,7 +77,7 @@ class Remove(AbstractCUI):
                                         choices=[plugin.name for plugin in self.plugins.values()]).ask()) is None:
                 return
             if questionary.confirm("本当に削除しますか？").ask():
-                for plugin in self.plugins.values():
+                for plugin in list(self.plugins.values()):
                     if name in plugin.depend_updates:
                         plugin.depend_updates.remove(name)
                         print(f"{plugin.name}の依存先から{name}を削除しました")
