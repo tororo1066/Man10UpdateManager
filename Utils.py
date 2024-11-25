@@ -7,17 +7,16 @@ from data_class.Server import Server
 def copy_files(src_folder: str, dest: str, dest_server: Server):
     try:
         client = dest_server.create_ssh_client()
-        print("Connected to {}".format(dest_server.host.name))
+        print(f"{dest_server.host.name}に接続しました")
 
         sftp = client.open_sftp()
 
-        print("Trying to copy files from {} to {}".format(src_folder, dest_server.path + dest))
+        print(f"{src_folder}から{os.path.join(dest_server.path, dest)}にファイルをコピー中...")
         for file in os.listdir(src_folder):
             path = os.path.join(src_folder, file)
             dest_path = os.path.join(dest_server.path, dest, file)
-            print("Trying to copy {} to {}".format(path, dest_path))
             sftp.put(path, dest_path)
-            print("Copied {} to {}".format(path, dest_path))
+            print(f"{path}を{dest_path}にコピーしました")
 
         sftp.close()
         client.close()
@@ -27,18 +26,16 @@ def copy_files(src_folder: str, dest: str, dest_server: Server):
 def remove_files(pattern: Pattern, dest: str, dest_server: Server):
     try:
         client = dest_server.create_ssh_client()
-        print("Connected to {}".format(dest_server.host.name))
+        print(f"{dest_server.host.name}に接続しました")
 
         sftp = client.open_sftp()
 
-        print("Trying to remove files that match {} from {}".format(pattern, os.path.join(dest_server.path, dest)))
+        print(f"{os.path.join(dest_server.path, dest)}から{pattern}にマッチするファイルを削除中...")
         for file in sftp.listdir(os.path.join(dest_server.path, dest)):
             file_path = sftp.normalize(os.path.join(dest_server.path, dest, file))
-            print("Checking {}".format(file))
             if os.path.isfile(file_path) and pattern.match(file):
-                print("Trying to remove {}".format(file))
                 sftp.remove(file_path)
-                print("Removed {}".format(file))
+                print(f"{file_path}を削除しました")
 
         sftp.close()
         client.close()

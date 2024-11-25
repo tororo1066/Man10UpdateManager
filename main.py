@@ -74,17 +74,33 @@ if __name__ == '__main__':
             continue
 
         if command == "update":
-            update_servers = ["全て"]
-            for server in servers.values():
-                update_servers.append(server.name)
-            if (target := questionary.select("更新するサーバーを選択してください", choices=update_servers).ask()) is None:
+            which = questionary.select("どちらを対象にしますか？", choices=["全て", "サーバー", "プラグイン"]).ask()
+            if which is None:
                 continue
-            if target == "全て":
+            if which == "全て":
                 for plugin in plugins.values():
                     plugin.update(plugins)
-            else:
+            elif which == "サーバー":
+                if not servers:
+                    print("サーバーが登録されていません")
+                    continue
+                update_servers = [server.name for server in servers.values()]
+                if (target := questionary.checkbox("更新するサーバーを選択してください",
+                                                 choices=update_servers).ask()) is None:
+                    continue
                 for plugin in plugins.values():
                     plugin.update(plugins, target)
+            elif which == "プラグイン":
+                if not plugins:
+                    print("プラグインが登録されていません")
+                    continue
+                update_plugins = [plugin.name for plugin in plugins.values()]
+                if (target := questionary.checkbox("更新するプラグインを選択してください",
+                                                 choices=update_plugins).ask()) is None:
+                    continue
+                for plugin_name in target:
+                    plugins[plugin_name].update(plugins)
+
 
         if command == "list host":
             for host in hosts.values():
