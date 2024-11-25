@@ -7,7 +7,7 @@ from data_class.Server import Server
 
 def copy_files(src_folder: str, dest: str, dest_server: Server):
     if dest_server.host.local:
-        copy_files_local(src_folder, dest)
+        copy_files_local(src_folder, os.path.join(dest_server.path, dest))
         return
     try:
         client = dest_server.host.create_ssh_client()
@@ -29,7 +29,7 @@ def copy_files(src_folder: str, dest: str, dest_server: Server):
 
 def remove_files(pattern: Pattern, dest: str, dest_server: Server):
     if dest_server.host.local:
-        remove_files_local(pattern, dest)
+        remove_files_local(pattern, os.path.join(dest_server.path, dest))
         return
     try:
         client = dest_server.host.create_ssh_client()
