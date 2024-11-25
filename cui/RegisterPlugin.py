@@ -19,6 +19,9 @@ class RegisterPlugin(AbstractCUI):
         return "プラグインを登録します"
 
     def run(self):
+        if not self.servers:
+            print("サーバが登録されていません")
+            return
         while True:
             if (name := questionary.text("表示名を入力してください").ask()) is None:
                 return
@@ -33,9 +36,15 @@ class RegisterPlugin(AbstractCUI):
             return
         if (remove_pattern := questionary.text("削除するファイルの正規表現を入力してください").ask()) is None:
             return
-        if (depend_updates := questionary.checkbox("このプラグインを適用する際に更新するプラグインを選択してください", choices=[plugin.name for plugin in self.plugins.values()]).ask()) is None:
-            return
-        self.plugins[name] = Plugin(name, re.compile(remove_pattern), source_folder, [self.servers[server] for server in target_servers], [depend_updates])
+        if self.plugins:
+            if (
+            depend_updates := questionary.checkbox("このプラグインを適用する際に更新するプラグインを選択してください",
+                                                   choices=[plugin.name for plugin in
+                                                            self.plugins.values()]).ask()) is None:
+                return
+        else:
+            depend_updates = []
+        self.plugins[name] = Plugin(name, re.compile(remove_pattern), source_folder, [self.servers[server] for server in target_servers], depend_updates)
         with open("data/plugins.json", "w") as file:
             json.dump([plugin.to_json() for plugin in self.plugins.values()], file, indent=4)
         print("登録が完了しました")
