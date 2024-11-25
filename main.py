@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import List, Dict
 
 import questionary
 
@@ -13,9 +13,9 @@ from cui.RegisterHost import RegisterHost
 from cui.RegisterPlugin import RegisterPlugin
 from cui.RegisterServer import RegisterServer
 
-hosts: dict[str, Host] = {}
-servers: dict[str, Server] = {}
-plugins: dict[str, Plugin] = {}
+hosts: Dict[str, Host] = {}
+servers: Dict[str, Server] = {}
+plugins: Dict[str, Plugin] = {}
 
 registers: List[AbstractCUI] = [
     RegisterHost(hosts),
