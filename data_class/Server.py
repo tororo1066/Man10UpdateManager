@@ -8,7 +8,10 @@ class Server:
     def __init__(self, name: str, host: Host, path: str):
         self.name = name
         self.host = host
-        self.path = os.path.join(path, "plugins")
+        self.path = path
+
+    def path_with_plugins(self):
+        return os.path.join(self.path, "plugins")
 
     @staticmethod
     def from_json(hosts, json):

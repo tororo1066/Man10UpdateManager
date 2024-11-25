@@ -7,7 +7,7 @@ from data_class.Server import Server
 
 def copy_files(src_folder: str, dest: str, dest_server: Server):
     if dest_server.host.local:
-        copy_files_local(src_folder, os.path.join(dest_server.path, dest))
+        copy_files_local(src_folder, os.path.join(dest_server.path_with_plugins(), dest))
         return
     try:
         client = dest_server.host.create_ssh_client()
@@ -15,10 +15,10 @@ def copy_files(src_folder: str, dest: str, dest_server: Server):
 
         sftp = client.open_sftp()
 
-        print(f"{src_folder}から{os.path.join(dest_server.path, dest)}にファイルをコピー中...")
+        print(f"{src_folder}から{os.path.join(dest_server.path_with_plugins(), dest)}にファイルをコピー中...")
         for file in os.listdir(src_folder):
             path = os.path.join(src_folder, file)
-            dest_path = os.path.join(dest_server.path, dest, file)
+            dest_path = os.path.join(dest_server.path_with_plugins(), dest, file)
             sftp.put(path, dest_path)
             print(f"{path}を{dest_path}にコピーしました")
 
@@ -29,7 +29,7 @@ def copy_files(src_folder: str, dest: str, dest_server: Server):
 
 def remove_files(pattern: Pattern, dest: str, dest_server: Server):
     if dest_server.host.local:
-        remove_files_local(pattern, os.path.join(dest_server.path, dest))
+        remove_files_local(pattern, os.path.join(dest_server.path_with_plugins(), dest))
         return
     try:
         client = dest_server.host.create_ssh_client()
@@ -38,8 +38,8 @@ def remove_files(pattern: Pattern, dest: str, dest_server: Server):
         sftp = client.open_sftp()
 
         print(f"{os.path.join(dest_server.path, dest)}から{pattern}にマッチするファイルを削除中...")
-        for file in sftp.listdir(os.path.join(dest_server.path, dest)):
-            file_path = sftp.normalize(os.path.join(dest_server.path, dest, file))
+        for file in sftp.listdir(os.path.join(dest_server.path_with_plugins(), dest)):
+            file_path = sftp.normalize(os.path.join(dest_server.path_with_plugins(), dest, file))
             if os.path.isfile(file_path) and pattern.match(file):
                 sftp.remove(file_path)
                 print(f"{file_path}を削除しました")
