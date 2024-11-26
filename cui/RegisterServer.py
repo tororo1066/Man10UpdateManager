@@ -38,7 +38,7 @@ class RegisterServer(AbstractCUI):
             return
         self.servers[name] = Server(name, self.hosts[host], path)
         for plugin in plugins:
-            self.servers[name].plugins.append(self.plugins[plugin])
+            self.plugins[plugin].target_servers.append(self.servers[name])
         with open("data/servers.json", "w") as file:
             json.dump([server.to_json() for server in self.servers.values()], file, indent=4)
         with open("data/plugins.json", "w") as file:
