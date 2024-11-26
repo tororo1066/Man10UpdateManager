@@ -8,9 +8,10 @@ from cui.AbstractCUI import AbstractCUI
 
 class RegisterServer(AbstractCUI):
 
-    def __init__(self, servers, hosts):
+    def __init__(self, servers, hosts, plugins):
         self.servers = servers
         self.hosts = hosts
+        self.plugins = plugins
 
     def get_command(self):
         return "server"
@@ -33,7 +34,13 @@ class RegisterServer(AbstractCUI):
             return
         if (path := questionary.text("パスを入力してください").ask()) is None:
             return
+        if (plugins := questionary.checkbox("あらかじめ適用するプラグインを選択してください", choices=[plugin.name for plugin in self.plugins.values()]).ask()) is None:
+            return
         self.servers[name] = Server(name, self.hosts[host], path)
+        for plugin in plugins:
+            self.servers[name].plugins.append(self.plugins[plugin])
         with open("data/servers.json", "w") as file:
             json.dump([server.to_json() for server in self.servers.values()], file, indent=4)
+        with open("data/plugins.json", "w") as file:
+            json.dump([plugin.to_json() for plugin in self.plugins.values()], file, indent=4)
         print("登録が完了しました")

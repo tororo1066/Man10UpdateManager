@@ -20,7 +20,7 @@ plugins: Dict[str, Plugin] = {}
 
 registers: List[AbstractCUI] = [
     RegisterHost(hosts),
-    RegisterServer(servers, hosts),
+    RegisterServer(servers, hosts, plugins),
     RegisterPlugin(plugins, servers),
     Edit(hosts, plugins, servers),
     Remove(hosts, plugins, servers)
