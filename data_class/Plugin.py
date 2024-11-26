@@ -1,7 +1,6 @@
 import re
 from typing import List, Pattern
 
-import Utils
 from data_class.Server import Server
 
 
@@ -31,13 +30,3 @@ class Plugin:
 
     def __str__(self):
         return f"{self.name}(remove_pattern: {self.remove_pattern.pattern}, source_folder: {self.source_folder}, target_servers: {[server.name for server in self.target_servers]}, depend_updates: {self.depend_updates})"
-
-    def update(self, plugins, servers: List[str] = None):
-        if servers is None:
-            servers = []
-        for depend_update in self.depend_updates:
-            plugins[depend_update].update(servers)
-        for server in self.target_servers:
-            if len(servers) == 0 or server.host in servers:
-                # Utils.remove_files(self.remove_pattern, "", server)
-                Utils.copy_files(self.source_folder, "", server)

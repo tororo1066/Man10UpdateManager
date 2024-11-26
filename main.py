@@ -3,6 +3,7 @@ from typing import List, Dict
 
 import questionary
 
+import Utils
 from cui.Edit import Edit
 from cui.Remove import Remove
 from data_class.Host import Host
@@ -78,29 +79,17 @@ if __name__ == '__main__':
             if which is None:
                 continue
             if which == "全て":
-                for plugin in plugins.values():
-                    plugin.update(plugins)
+                Utils.copy_files(hosts, servers, plugins, list(servers.keys()), list(plugins.keys()))
             elif which == "サーバー":
-                if not servers:
-                    print("サーバーが登録されていません")
+                update_servers = questionary.checkbox("更新するサーバーを選択してください", choices=[server.name for server in servers.values()]).ask()
+                if update_servers is None:
                     continue
-                update_servers = [server.name for server in servers.values()]
-                if (target := questionary.checkbox("更新するサーバーを選択してください",
-                                                 choices=update_servers).ask()) is None:
-                    continue
-                for plugin in plugins.values():
-                    plugin.update(plugins, target)
+                Utils.copy_files(hosts, servers, plugins, update_servers, list(plugins.keys()))
             elif which == "プラグイン":
-                if not plugins:
-                    print("プラグインが登録されていません")
+                update_plugins = questionary.checkbox("更新するプラグインを選択してください", choices=[plugin.name for plugin in plugins.values()]).ask()
+                if update_plugins is None:
                     continue
-                update_plugins = [plugin.name for plugin in plugins.values()]
-                if (target := questionary.checkbox("更新するプラグインを選択してください",
-                                                 choices=update_plugins).ask()) is None:
-                    continue
-                for plugin_name in target:
-                    plugins[plugin_name].update(plugins)
-
+                Utils.copy_files(hosts, servers, plugins, list(servers.keys()), update_plugins)
 
         if command == "list host":
             for host in hosts.values():
