@@ -121,7 +121,7 @@ class Edit(AbstractCUI):
                 if (new_depend_updates := questionary.checkbox("依存するプラグインを選択してください",
                                                              choices=[Choice(plugin.name, checked=plugin in plugin.depend_updates) for plugin in self.plugins.values()]).ask()) is None:
                     return
-                plugin.depend_updates = [plugin for plugin in self.plugins.values() if plugin.name in new_depend_updates]
+                plugin.depend_updates = new_depend_updates
             elif selected == "保存":
                 break
         with open("data/plugins.json", "w") as file:
