@@ -70,6 +70,8 @@ def remove_files(hosts: Dict[str, Host], servers: Dict[str, Server], plugins: Di
     clients = {}
     for host_name in group_by_host:
         host = hosts[host_name]
+        if host.local:
+            continue
         clients[host_name] = host.create_ssh_client()
         print(f"{host_name}に接続しました")
 
