@@ -46,10 +46,12 @@ class Remove(AbstractCUI):
                         print(f"{server.name}を削除しました")
                         del self.servers[server.name]
                 del self.hosts[name]
+                host_values = [host.to_json() for host in self.hosts.values()]
                 with open("data/hosts.json", "w") as file:
-                    json.dump([host.to_json() for host in self.hosts.values()], file, indent=4)
+                    json.dump(host_values, file, indent=4)
+                server_values = [server.to_json() for server in self.servers.values()]
                 with open("data/servers.json", "w") as file:
-                    json.dump([server.to_json() for server in self.servers.values()], file, indent=4)
+                    json.dump(server_values, file, indent=4)
                 print("削除が完了しました")
 
         def remove_server(self):
@@ -66,10 +68,12 @@ class Remove(AbstractCUI):
                         plugin.target_servers.remove(self.servers[name])
                         print(f"{plugin.name}の依存先から{name}を削除しました")
                 del self.servers[name]
+                server_values = [server.to_json() for server in self.servers.values()]
                 with open("data/servers.json", "w") as file:
-                    json.dump([server.to_json() for server in self.servers.values()], file, indent=4)
+                    json.dump(server_values, file, indent=4)
+                plugin_values = [plugin.to_json() for plugin in self.plugins.values()]
                 with open("data/plugins.json", "w") as file:
-                    json.dump([plugin.to_json() for plugin in self.plugins.values()], file, indent=4)
+                    json.dump(plugin_values, file, indent=4)
                 print("削除が完了しました")
 
         def remove_plugin(self):
@@ -86,6 +90,7 @@ class Remove(AbstractCUI):
                         plugin.depend_updates.remove(name)
                         print(f"{plugin.name}の依存先から{name}を削除しました")
                 del self.plugins[name]
+                plugin_values = [plugin.to_json() for plugin in self.plugins.values()]
                 with open("data/plugins.json", "w") as file:
-                    json.dump([plugin.to_json() for plugin in self.plugins.values()], file, indent=4)
+                    json.dump(plugin_values, file, indent=4)
                 print("削除が完了しました")

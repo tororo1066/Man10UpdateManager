@@ -34,7 +34,8 @@ class RegisterHost(AbstractCUI):
             if (password := questionary.password("パスワードを入力してください").ask()) is None:
                 return
             self.hosts[name] = Host(name, host, user, password)
+        values = [host.to_json() for host in self.hosts.values()]
         with open("data/hosts.json", "w") as file:
-            json.dump([host.to_json() for host in self.hosts.values()], file, indent=4)
+            json.dump(values, file, indent=4)
         print("登録が完了しました")
 

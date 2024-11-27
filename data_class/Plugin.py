@@ -23,6 +23,15 @@ class Plugin:
                 print(f"[{json['name']}] Server {e.args[0]} is not found. Removing...")
                 json["target_servers"].remove(e.args[0])
 
+        check = True
+        try:
+            re.compile(json["remove_pattern"])
+        except re.error:
+            check = False
+        if not json["remove_pattern"] or not check:
+            raise ValueError(f"[{json['name']}] Invalid regular expression: {json['remove_pattern']}")
+
+
         return Plugin(json["name"], re.compile(json["remove_pattern"]), json["source_folder"], target_servers, json["depend_updates"])
 
     def to_json(self):

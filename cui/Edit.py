@@ -1,4 +1,5 @@
 import json
+import re
 
 import questionary
 from questionary import Choice
@@ -57,8 +58,9 @@ class Edit(AbstractCUI):
                 host.password = new_password
             elif selected == "保存":
                 break
+        values = [host.to_json() for host in self.hosts.values()]
         with open("data/hosts.json", "w") as file:
-            json.dump([host.to_json() for host in self.hosts.values()], file, indent=4)
+            json.dump(values, file, indent=4)
         print("編集が完了しました")
 
     def edit_server(self):
@@ -86,8 +88,9 @@ class Edit(AbstractCUI):
                 server.path = new_path
             elif selected == "保存":
                 break
+        values = [server.to_json() for server in self.servers.values()]
         with open("data/servers.json", "w") as file:
-            json.dump([server.to_json() for server in self.servers.values()], file, indent=4)
+            json.dump(values, file, indent=4)
         print("編集が完了しました")
 
     def edit_plugin(self):
@@ -107,7 +110,14 @@ class Edit(AbstractCUI):
             elif selected == "削除するファイルの正規表現":
                 if (new_remove_pattern := questionary.text("削除するファイルの正規表現を入力してください").ask()) is None:
                     return
-                plugin.remove_pattern = new_remove_pattern
+                if not new_remove_pattern:
+                    print("空文字は許可されていません")
+                    continue
+                try:
+                    plugin.remove_pattern = re.compile(new_remove_pattern)
+                except re.error:
+                    print("正規表現が不正です")
+                    continue
             elif selected == "プラグインが入っているフォルダのパス":
                 if (new_source_folder := questionary.path("プラグインが入っているフォルダのパスを入力してください",).ask()) is None:
                     return
@@ -124,6 +134,7 @@ class Edit(AbstractCUI):
                 plugin.depend_updates = new_depend_updates
             elif selected == "保存":
                 break
+        values = [plugin.to_json() for plugin in self.plugins.values()]
         with open("data/plugins.json", "w") as file:
-            json.dump([plugin.to_json() for plugin in self.plugins.values()], file, indent=4)
+            json.dump(values, file, indent=4)
         print("編集が完了しました")

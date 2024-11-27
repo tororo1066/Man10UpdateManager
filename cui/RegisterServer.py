@@ -39,8 +39,10 @@ class RegisterServer(AbstractCUI):
         self.servers[name] = Server(name, self.hosts[host], path)
         for plugin in plugins:
             self.plugins[plugin].target_servers.append(self.servers[name])
+        server_values = [server.to_json() for server in self.servers.values()]
         with open("data/servers.json", "w") as file:
-            json.dump([server.to_json() for server in self.servers.values()], file, indent=4)
+            json.dump(server_values, file, indent=4)
+        plugin_values = [plugin.to_json() for plugin in self.plugins.values()]
         with open("data/plugins.json", "w") as file:
-            json.dump([plugin.to_json() for plugin in self.plugins.values()], file, indent=4)
+            json.dump(plugin_values, file, indent=4)
         print("登録が完了しました")

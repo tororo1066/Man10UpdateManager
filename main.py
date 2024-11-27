@@ -2,6 +2,7 @@ import json
 from typing import List, Dict
 
 import questionary
+from filelock import FileLock
 
 import Utils
 from cui.Edit import Edit
@@ -27,6 +28,13 @@ registers: List[AbstractCUI] = [
 ]
 
 if __name__ == '__main__':
+    try:
+        with FileLock("script.lock"):
+            pass
+    except Exception as e:
+        print("他のプロセスが実行中です")
+        exit(1)
+
     def help_commands():
         print("Commands:")
         print("  help: ヘルプを表示します")
