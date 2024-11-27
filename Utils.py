@@ -83,6 +83,7 @@ def remove_files(hosts: Dict[str, Host], servers: Dict[str, Server], plugins: Di
                     print(f"{plugin_name}を{server.name}から削除中...")
                     for file in os.listdir(server.path_with_plugins()):
                         file_path = os.path.join(server.path_with_plugins(), file)
+                        print(f"Debug: file_path = {file_path}")
                         print(f"Debug: os.path.isfile(file_path) = {os.path.isfile(file_path)}")
                         if os.path.isfile(file_path) and plugin.remove_pattern.match(file):
                             os.remove(file_path)
