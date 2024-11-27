@@ -33,6 +33,7 @@ if __name__ == '__main__':
         for _register in registers:
             print(f"  {_register.get_command()}: {_register.get_description()}")
         print("  update: プラグインを更新します")
+        print("  delete and update: プラグインを削除して更新します")
         print("  list <host/server/plugin>: 登録されているホスト/サーバ/プラグインを表示します")
         print("  exit: 終了します")
     # Load hosts from file
@@ -74,21 +75,28 @@ if __name__ == '__main__':
             help_commands()
             continue
 
-        if command == "update":
+        if command == "update" or command == "delete and update":
+            delete = command == "delete and update"
             which = questionary.select("どちらを対象にしますか？", choices=["全て", "サーバー", "プラグイン"]).ask()
             if which is None:
                 continue
             if which == "全て":
+                if delete:
+                    Utils.remove_files(hosts, servers, plugins, list(servers.keys()), list(plugins.keys()))
                 Utils.copy_files(hosts, servers, plugins, list(servers.keys()), list(plugins.keys()))
             elif which == "サーバー":
                 update_servers = questionary.checkbox("更新するサーバーを選択してください", choices=[server.name for server in servers.values()]).ask()
                 if update_servers is None:
                     continue
+                if delete:
+                    Utils.remove_files(hosts, servers, plugins, update_servers, list(plugins.keys()))
                 Utils.copy_files(hosts, servers, plugins, update_servers, list(plugins.keys()))
             elif which == "プラグイン":
                 update_plugins = questionary.checkbox("更新するプラグインを選択してください", choices=[plugin.name for plugin in plugins.values()]).ask()
                 if update_plugins is None:
                     continue
+                if delete:
+                    Utils.remove_files(hosts, servers, plugins, list(servers.keys()), update_plugins)
                 Utils.copy_files(hosts, servers, plugins, list(servers.keys()), update_plugins)
 
         if command == "list host":
